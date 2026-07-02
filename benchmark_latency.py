@@ -8,11 +8,33 @@ nothing beyond numpy and the local scorer.
 from __future__ import annotations
 
 import argparse
+import os
+import platform
 import time
 
 import numpy as np
 
 from memory_qc_edge import MemoryQCScorer
+
+
+def print_device_info() -> None:
+    """Emit device/CPU/numpy details so a benchmark result is self-documenting."""
+    model = ""
+    try:  # Raspberry Pi exposes a board name here.
+        with open("/proc/device-tree/model") as f:
+            model = f.read().strip("\x00").strip()
+    except OSError:
+        pass
+    print("== device ==")
+    if model:
+        print(f"board            : {model}")
+    print(f"platform         : {platform.platform()}")
+    print(f"machine          : {platform.machine()}")
+    print(f"processor        : {platform.processor() or 'n/a'}")
+    print(f"cpu count        : {os.cpu_count()}")
+    print(f"python           : {platform.python_version()}")
+    print(f"numpy            : {np.__version__}")
+    print()
 
 
 def main() -> None:
@@ -22,6 +44,8 @@ def main() -> None:
     p.add_argument("--k", type=int, default=15)
     p.add_argument("--repeats", type=int, default=20)
     args = p.parse_args()
+
+    print_device_info()
 
     data = np.load(args.features)
     feats, labels = data["features"], data["labels"]
