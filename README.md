@@ -1,5 +1,7 @@
 # memory-qc-edge
 
+[![ci](https://github.com/JPL11/memory_qc_edge/actions/workflows/ci.yml/badge.svg)](https://github.com/JPL11/memory_qc_edge/actions/workflows/ci.yml)
+
 Deployable, **numpy-only** on-device memory-QC scoring layer for MRI
 segmentation failure review. This is the edge half of the memory-QC agent,
 separated from the research/training code (SpikeBridge, segmenter training,

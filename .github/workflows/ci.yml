@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install runtime deps (numpy only)
+        run: python -m pip install --upgrade "numpy>=1.23"
+      - name: Assert numpy-only runtime (no torch/monai/sklearn)
+        run: |
+          for pkg in torch monai sklearn; do
+            if python -c "import $pkg" 2>/dev/null; then
+              echo "ERROR: $pkg is importable; runtime must be numpy-only"; exit 1
+            fi
+          done
+          echo "OK: torch/monai/sklearn absent"
+      - name: Run edge smoke tests
+        run: python test_memory_qc_edge.py
